@@ -1,0 +1,35 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  name    String
+  tickets Ticket[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  venue       String
+  date        DateTime
+  priceYen    Int
+  ticketsLeft Int
+  tickets     Ticket[]
+}
+
+model Ticket {
+  code        String    @id
+  userId      Int
+  eventId     Int
+  checkedInAt DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  event       Event     @relation(fields: [eventId], references: [id])
+}
