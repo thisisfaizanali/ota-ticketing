@@ -17,6 +17,12 @@ export type Ticket = {
 
 export type TicketWithEvent = Ticket & { event: Event };
 
+export class ApiError extends Error {
+  constructor(message: string, readonly status: number, readonly body: any) {
+    super(message);
+  }
+}
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const USER_ID = process.env.EXPO_PUBLIC_USER_ID ?? "";
 
@@ -37,7 +43,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     clearTimeout(timer);
   }
   const body = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(body?.error ?? `Request failed (${res.status})`);
+  if (!res.ok) throw new ApiError(body?.error ?? `Request failed (${res.status})`, res.status, body);
   return body as T;
 }
 
@@ -47,6 +53,9 @@ export const bookEvent = (id: number, quantity: number) =>
   request<Ticket[]>(`/events/${id}/book`, { method: "POST", body: JSON.stringify({ quantity }) });
 
 export const getMyTickets = () => request<TicketWithEvent[]>("/me/tickets");
+
+export const checkIn = (code: string) =>
+  request<Ticket & { event?: Event }>("/checkins", { method: "POST", body: JSON.stringify({ code }) });
 
 export const formatDate = (iso: string) =>
   new Date(iso).toLocaleString("ja-JP", { dateStyle: "medium", timeStyle: "short" });
