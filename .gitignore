@@ -4,4 +4,4 @@ node_modules
 dist
 .expo
 *.log
-src/generated
+api/src/generated/
