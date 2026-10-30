@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { errorMessage, locale } from "@/i18n";
 import { ApiError, bookEvent, formatDate, getEvents, type Event } from "@/api";
@@ -75,7 +76,10 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
     setBooking(true);
     try {
       await bookEvent(event.id, quantity);
-      Alert.alert(t("events.booked"), t("events.bookedMessage", { count: quantity, name: event.name }));
+      Alert.alert(t("events.booked"), t("events.bookedMessage", { count: quantity, name: event.name }), [
+        { text: t("common.ok") },
+        { text: t("events.viewTickets"), onPress: () => router.navigate("/tickets") },
+      ]);
       setQty(1);
     } catch (e) {
       const notEnough = e instanceof ApiError && e.status === 409;
