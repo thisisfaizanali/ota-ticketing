@@ -57,6 +57,7 @@ export default function EventsScreen() {
       contentContainerStyle={styles.list}
       refreshing={refreshing}
       onRefresh={refresh}
+      ListHeaderComponent={error ? <Text style={styles.banner}>{errorMessage(error)}</Text> : undefined}
       ListEmptyComponent={<Text style={styles.muted}>{t("events.empty")}</Text>}
     />
   );
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "600" },
   muted: { color: "#666" },
   error: { color: "#c00", textAlign: "center" },
+  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
   row: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
   price: { fontSize: 16, fontWeight: "600" },
   stepper: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 8 },

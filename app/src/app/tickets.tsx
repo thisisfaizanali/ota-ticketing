@@ -49,6 +49,7 @@ export default function TicketsScreen() {
       contentContainerStyle={styles.list}
       refreshing={refreshing}
       onRefresh={refresh}
+      ListHeaderComponent={error ? <Text style={styles.banner}>{errorMessage(error)}</Text> : undefined}
       ListEmptyComponent={<Text style={styles.empty}>{t("tickets.empty")}</Text>}
       renderItem={({ item }) => (
         <View style={styles.card}>
@@ -77,6 +78,7 @@ const styles = StyleSheet.create({
   muted: { color: "#666" },
   code: { fontFamily: "monospace", marginTop: 4 },
   error: { color: "#c00", textAlign: "center" },
+  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
   empty: { textAlign: "center", color: "#666", marginTop: 48 },
   badge: { marginTop: 8, backgroundColor: "#1a7f37", color: "#fff", borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, overflow: "hidden" },
 });
