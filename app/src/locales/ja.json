@@ -1,0 +1,27 @@
+{
+  "tabs": { "events": "イベント", "tickets": "マイチケット", "scan": "スキャン" },
+  "events": {
+    "empty": "開催予定のイベントはありません",
+    "left": "残り{{count}}枚",
+    "soldOut": "完売",
+    "book_other": "{{count}}枚予約する",
+    "booked": "予約しました",
+    "bookedMessage_other": "{{name}}のチケットを{{count}}枚予約しました",
+    "bookFailed": "予約できませんでした",
+    "notEnough": "残りのチケットが足りません。"
+  },
+  "tickets": { "empty": "チケットはまだありません", "checkedIn": "入場済み {{date}}" },
+  "scan": {
+    "permission": "チケットをスキャンするにはカメラへのアクセスが必要です。",
+    "allow": "カメラを許可",
+    "denied": "カメラへのアクセスが拒否されました。端末の設定でこのアプリのカメラを許可してください。",
+    "checkedIn": "入場済みにしました\n{{name}}",
+    "already": "{{date}}に入場済みです",
+    "unknown": "無効なチケットです",
+    "next": "次をスキャン"
+  },
+  "common": {
+    "retry": "再試行",
+    "network": "サーバーに接続できません。通信環境とEXPO_PUBLIC_API_URLを確認してください。"
+  }
+}
