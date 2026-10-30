@@ -10,7 +10,8 @@
     "bookedMessage_one": "{{name}}のチケットを{{count}}枚予約しました",
     "bookedMessage_other": "{{name}}のチケットを{{count}}枚予約しました",
     "bookFailed": "予約できませんでした",
-    "notEnough": "残りのチケットが足りません。"
+    "notEnough": "残りのチケットが足りません。",
+    "viewTickets": "チケットを見る"
   },
   "tickets": { "empty": "チケットはまだありません", "checkedIn": "入場済み {{date}}" },
   "scan": {
@@ -24,6 +25,7 @@
   },
   "common": {
     "retry": "再試行",
+    "ok": "OK",
     "network": "サーバーに接続できません。通信環境とEXPO_PUBLIC_API_URLを確認してください。"
   }
 }

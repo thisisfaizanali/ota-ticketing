@@ -10,7 +10,8 @@
     "bookedMessage_one": "{{count}} ticket for {{name}}",
     "bookedMessage_other": "{{count}} tickets for {{name}}",
     "bookFailed": "Booking failed",
-    "notEnough": "Not enough tickets left."
+    "notEnough": "Not enough tickets left.",
+    "viewTickets": "View tickets"
   },
   "tickets": { "empty": "No tickets yet", "checkedIn": "Checked in {{date}}" },
   "scan": {
@@ -24,6 +25,7 @@
   },
   "common": {
     "retry": "Retry",
+    "ok": "OK",
     "network": "Can't reach the server. Check your connection and EXPO_PUBLIC_API_URL."
   }
 }

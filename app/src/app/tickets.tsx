@@ -5,6 +5,7 @@ import QRCode from "react-native-qrcode-svg";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "@/i18n";
 import { formatDate, getMyTickets, type TicketWithEvent } from "@/api";
+import { colors, radius, space } from "@/theme";
 
 export default function TicketsScreen() {
   const { t } = useTranslation();
@@ -52,8 +53,12 @@ export default function TicketsScreen() {
       ListHeaderComponent={error ? <Text style={styles.banner}>{errorMessage(error)}</Text> : undefined}
       ListEmptyComponent={<Text style={styles.empty}>{t("tickets.empty")}</Text>}
       renderItem={({ item }) => (
-        <View style={styles.card}>
-          <QRCode value={item.code} size={160} />
+        <View style={[styles.card, item.checkedInAt && styles.used]}>
+          <View style={styles.qr}>
+            <QRCode value={item.code} size={160} />
+          </View>
+          {/* Dashed tear line between the stub and the details. */}
+          <View style={styles.tear} />
           <View style={styles.info}>
             <Text style={styles.title}>{item.event.name}</Text>
             <Text style={styles.muted}>{formatDate(item.event.date)}</Text>
@@ -70,15 +75,18 @@ export default function TicketsScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  list: { padding: 16, gap: 12 },
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, alignItems: "center", gap: 12, elevation: 2 },
-  info: { alignItems: "center", gap: 2 },
-  title: { fontSize: 18, fontWeight: "600" },
-  muted: { color: "#666" },
-  code: { fontFamily: "monospace", marginTop: 4 },
-  error: { color: "#c00", textAlign: "center" },
-  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
-  empty: { textAlign: "center", color: "#666", marginTop: 48 },
-  badge: { marginTop: 8, backgroundColor: "#1a7f37", color: "#fff", borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, overflow: "hidden" },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: space.xl, gap: space.md },
+  list: { padding: space.lg, gap: space.lg },
+  card: { backgroundColor: colors.card, borderRadius: radius.md, elevation: 2, overflow: "hidden" },
+  used: { opacity: 0.5 },
+  qr: { alignItems: "center", padding: space.xl },
+  tear: { borderTopWidth: 2, borderStyle: "dashed", borderColor: colors.border, marginHorizontal: space.md },
+  info: { alignItems: "center", gap: 2, padding: space.lg },
+  title: { fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "center" },
+  muted: { color: colors.muted },
+  code: { fontFamily: "monospace", marginTop: space.sm, color: colors.text, letterSpacing: 1 },
+  error: { color: colors.danger, textAlign: "center" },
+  banner: { backgroundColor: colors.danger, color: colors.white, borderRadius: radius.sm, padding: 10, textAlign: "center", overflow: "hidden" },
+  empty: { textAlign: "center", color: colors.muted, marginTop: 48 },
+  badge: { marginTop: space.sm, backgroundColor: colors.success, color: colors.white, fontWeight: "600", borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: space.xs, overflow: "hidden" },
 });

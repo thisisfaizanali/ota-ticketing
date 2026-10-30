@@ -9,9 +9,11 @@ import {
   Text,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { errorMessage, locale } from "@/i18n";
 import { ApiError, bookEvent, formatDate, getEvents, type Event } from "@/api";
+import { colors, radius, space } from "@/theme";
 
 const yen = (n: number) => new Intl.NumberFormat(locale(), { style: "currency", currency: "JPY" }).format(n);
 
@@ -75,7 +77,10 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
     setBooking(true);
     try {
       await bookEvent(event.id, quantity);
-      Alert.alert(t("events.booked"), t("events.bookedMessage", { count: quantity, name: event.name }));
+      Alert.alert(t("events.booked"), t("events.bookedMessage", { count: quantity, name: event.name }), [
+        { text: t("common.ok") },
+        { text: t("events.viewTickets"), onPress: () => router.navigate("/tickets") },
+      ]);
       setQty(1);
     } catch (e) {
       const notEnough = e instanceof ApiError && e.status === 409;
@@ -89,11 +94,16 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{event.name}</Text>
-      <Text style={styles.muted}>{formatDate(event.date)}</Text>
-      <Text style={styles.muted}>{event.venue}</Text>
+      <Text style={styles.muted}>{formatDate(event.date)} · {event.venue}</Text>
       <View style={styles.row}>
         <Text style={styles.price}>{yen(event.priceYen)}</Text>
-        <Text style={styles.muted}>{t("events.left", { count: event.ticketsLeft })}</Text>
+        {soldOut ? (
+          <Text style={styles.soldOutPill}>{t("events.soldOut")}</Text>
+        ) : (
+          <Text style={[styles.left, event.ticketsLeft <= 5 && styles.leftLow]}>
+            {t("events.left", { count: event.ticketsLeft })}
+          </Text>
+        )}
       </View>
       {!soldOut && (
         <View style={styles.stepper}>
@@ -108,7 +118,7 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
         onPress={book}
       >
         {booking ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.white} />
         ) : (
           <Text style={styles.bookText}>{soldOut ? t("events.soldOut") : t("events.book", { count: quantity })}</Text>
         )}
@@ -126,21 +136,24 @@ function StepButton({ label, disabled, onPress }: { label: string; disabled: boo
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  list: { padding: 16, gap: 12 },
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, gap: 4, elevation: 2 },
-  title: { fontSize: 18, fontWeight: "600" },
-  muted: { color: "#666" },
-  error: { color: "#c00", textAlign: "center" },
-  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
-  row: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
-  price: { fontSize: 16, fontWeight: "600" },
-  stepper: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 8 },
-  step: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#eee", alignItems: "center", justifyContent: "center" },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: space.xl, gap: space.md },
+  list: { padding: space.lg, gap: space.md },
+  card: { backgroundColor: colors.card, borderRadius: radius.md, padding: space.lg, gap: space.xs, elevation: 2 },
+  title: { fontSize: 18, fontWeight: "700", color: colors.text },
+  muted: { color: colors.muted },
+  error: { color: colors.danger, textAlign: "center" },
+  banner: { backgroundColor: colors.danger, color: colors.white, borderRadius: radius.sm, padding: 10, textAlign: "center", overflow: "hidden" },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: space.sm },
+  price: { fontSize: 22, fontWeight: "700", color: colors.text },
+  left: { color: colors.muted, fontWeight: "600" },
+  leftLow: { color: colors.warning },
+  soldOutPill: { backgroundColor: colors.danger, color: colors.white, fontWeight: "600", borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 2, overflow: "hidden" },
+  stepper: { flexDirection: "row", alignItems: "center", gap: space.lg, marginTop: space.sm },
+  step: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.border, alignItems: "center", justifyContent: "center" },
   stepDisabled: { opacity: 0.4 },
-  stepText: { fontSize: 20 },
-  qty: { fontSize: 18, minWidth: 20, textAlign: "center" },
-  book: { marginTop: 12, backgroundColor: "#208AEF", borderRadius: 8, height: 44, alignItems: "center", justifyContent: "center" },
-  bookDisabled: { backgroundColor: "#aaa" },
-  bookText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  stepText: { fontSize: 20, color: colors.text },
+  qty: { fontSize: 18, minWidth: 20, textAlign: "center", color: colors.text },
+  book: { marginTop: space.md, backgroundColor: colors.primary, borderRadius: radius.sm, height: 44, alignItems: "center", justifyContent: "center" },
+  bookDisabled: { backgroundColor: colors.disabled },
+  bookText: { color: colors.white, fontWeight: "600", fontSize: 16 },
 });
