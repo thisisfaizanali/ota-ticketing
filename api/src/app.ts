@@ -30,13 +30,11 @@ const requireUser: RequestHandler = async (req, res, next) => {
   res.locals.userId = user.id;
   next();
 };
-app.use(requireUser);
-
 app.get("/events", async (_req, res) => {
   res.json(await prisma.event.findMany({ where: { date: { gt: new Date() } }, orderBy: { date: "asc" } }));
 });
 
-app.post("/events/:id/book", async (req, res) => {
+app.post("/events/:id/book", requireUser, async (req, res) => {
   const quantity = req.body?.quantity;
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 4) {
     return res.status(400).json({ error: "quantity must be an integer from 1 to 4" });
@@ -63,7 +61,7 @@ app.post("/events/:id/book", async (req, res) => {
   res.status(201).json(tickets);
 });
 
-app.get("/me/tickets", async (_req, res) => {
+app.get("/me/tickets", requireUser, async (_req, res) => {
   res.json(
     await prisma.ticket.findMany({
       where: { userId: res.locals.userId },
