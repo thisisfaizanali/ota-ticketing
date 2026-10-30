@@ -72,10 +72,10 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
       await bookEvent(event.id, quantity);
       Alert.alert("Booked!", `${quantity} ticket(s) for ${event.name}`);
       setQty(1);
-      await onBooked();
     } catch (e) {
       Alert.alert("Booking failed", (e as Error).message);
     } finally {
+      await onBooked();
       setBooking(false);
     }
   };
