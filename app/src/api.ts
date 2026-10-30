@@ -1,3 +1,5 @@
+import { locale } from "@/i18n";
+
 export type Event = {
   id: number;
   name: string;
@@ -38,7 +40,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       headers: { "Content-Type": "application/json", "X-User-Id": USER_ID },
     });
   } catch {
-    throw new Error("Can't reach the server. Check your connection and EXPO_PUBLIC_API_URL.");
+    // Status 0 = never got a response (offline, timeout); screens translate it.
+    throw new ApiError("Network error", 0, null);
   } finally {
     clearTimeout(timer);
   }
@@ -58,4 +61,4 @@ export const checkIn = (code: string) =>
   request<Ticket & { event?: Event }>("/checkins", { method: "POST", body: JSON.stringify({ code }) });
 
 export const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString("ja-JP", { dateStyle: "medium", timeStyle: "short" });
+  new Date(iso).toLocaleString(locale(), { dateStyle: "medium", timeStyle: "short" });

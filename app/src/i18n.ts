@@ -13,4 +13,8 @@ i18n.use(initReactI18next).init({
 
 export const locale = () => (i18n.language === "ja" ? "ja-JP" : "en-US");
 
+// Translated message for errors every screen shares; anything else shows the server's text.
+export const errorMessage = (e: unknown) =>
+  (e as { status?: number }).status === 0 ? i18n.t("common.network") : (e as Error).message;
+
 export default i18n;
