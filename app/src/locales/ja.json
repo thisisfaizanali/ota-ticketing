@@ -4,8 +4,10 @@
     "empty": "開催予定のイベントはありません",
     "left": "残り{{count}}枚",
     "soldOut": "完売",
+    "book_one": "{{count}}枚予約する",
     "book_other": "{{count}}枚予約する",
     "booked": "予約しました",
+    "bookedMessage_one": "{{name}}のチケットを{{count}}枚予約しました",
     "bookedMessage_other": "{{name}}のチケットを{{count}}枚予約しました",
     "bookFailed": "予約できませんでした",
     "notEnough": "残りのチケットが足りません。"
