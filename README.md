@@ -122,6 +122,111 @@ Troubleshooting:
 - Allow Node.js through the firewall (on Windows, allow it on Private networks when prompted).
 - After changing `.env`, restart with a cleared cache: `npx expo start -c`. `EXPO_PUBLIC_*` values are baked in at bundle time.
 
+## API reference
+
+Base URL: `http://localhost:3000`. Request bodies are JSON (`Content-Type: application/json`).
+
+| Method & path | `X-User-Id` | Body | Success |
+| --- | --- | --- | --- |
+| `GET /events` | no | none | `200`, upcoming events, soonest first |
+| `POST /events/:id/book` | yes | `{ "quantity": 1-4 }` | `201`, array of created tickets |
+| `GET /me/tickets` | yes | none | `200`, the user's tickets with their event, newest first |
+| `POST /checkins` | no | `{ "code": "<ticket code>" }` | `200`, the checked-in ticket with its event |
+
+Errors always look like `{ "error": "message" }`:
+
+| Status | When |
+| --- | --- |
+| `400` | Invalid body (`quantity` not an integer 1-4, missing/empty `code`, malformed JSON) |
+| `401` | `X-User-Id` missing or not a seeded user |
+| `404` | Event not found or already past, ticket code not found, unknown route |
+| `409` | Not enough tickets left; ticket already checked in (also returns `checkedInAt`) |
+| `500` | Unexpected server error |
+
+### curl examples
+
+List upcoming events:
+
+```bash
+curl -s http://localhost:3000/events
+```
+
+```json
+[{"id":1,"name":"Tokyo Jazz Night","venue":"Blue Note Tokyo","date":"2026-11-02T20:38:41.849Z","priceYen":8000,"ticketsLeft":50},{"id":2,"name":"Indie Rock Live","venue":"Shibuya O-East","date":"2026-11-06T20:38:41.849Z","priceYen":5500,"ticketsLeft":2}, ...]
+```
+
+Book 1 ticket for event 1 as user 1 (`201`):
+
+```bash
+curl -s -X POST http://localhost:3000/events/1/book -H 'Content-Type: application/json' -H 'X-User-Id: 1' -d '{"quantity":1}'
+```
+
+```json
+[{"code":"287910d6df9c1e43","userId":1,"eventId":1,"checkedInAt":null,"createdAt":"2026-10-30T20:39:06.112Z"}]
+```
+
+Quantity above 4 (`400`):
+
+```bash
+curl -s -X POST http://localhost:3000/events/1/book -H 'Content-Type: application/json' -H 'X-User-Id: 1' -d '{"quantity":5}'
+```
+
+```json
+{"error":"quantity must be an integer from 1 to 4"}
+```
+
+No `X-User-Id` header (`401`):
+
+```bash
+curl -s -X POST http://localhost:3000/events/1/book -H 'Content-Type: application/json' -d '{"quantity":1}'
+```
+
+```json
+{"error":"invalid or missing X-User-Id"}
+```
+
+Ask for 3 tickets of event 2, which has only 2 left (`409`):
+
+```bash
+curl -s -X POST http://localhost:3000/events/2/book -H 'Content-Type: application/json' -H 'X-User-Id: 2' -d '{"quantity":3}'
+```
+
+```json
+{"error":"not enough tickets left"}
+```
+
+My tickets as user 1:
+
+```bash
+curl -s http://localhost:3000/me/tickets -H 'X-User-Id: 1'
+```
+
+```json
+[{"code":"287910d6df9c1e43","userId":1,"eventId":1,"checkedInAt":null,"createdAt":"2026-10-30T20:39:06.112Z","event":{"id":1,"name":"Tokyo Jazz Night", ...,"ticketsLeft":49}}]
+```
+
+Check in a ticket (use the `code` from your booking, `200`):
+
+```bash
+curl -s -X POST http://localhost:3000/checkins -H 'Content-Type: application/json' -d '{"code":"287910d6df9c1e43"}'
+```
+
+```json
+{"code":"287910d6df9c1e43","userId":1,"eventId":1,"checkedInAt":"2026-10-30T20:39:13.327Z","createdAt":"2026-10-30T20:39:06.112Z","event":{...}}
+```
+
+The same code again (`409`, with the first check-in time):
+
+```bash
+curl -s -X POST http://localhost:3000/checkins -H 'Content-Type: application/json' -d '{"code":"287910d6df9c1e43"}'
+```
+
+```json
+{"error":"ticket already checked in","checkedInAt":"2026-10-30T20:39:13.327Z"}
+```
+
+Codes, dates and timestamps will differ on your machine.
+
 ## Demo video
 
 Screen recording: <link>
