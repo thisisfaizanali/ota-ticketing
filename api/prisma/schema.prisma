@@ -25,8 +25,7 @@ model Event {
 }
 
 model Ticket {
-  id          Int       @id @default(autoincrement())
-  code        String    @unique
+  code        String    @id
   userId      Int
   eventId     Int
   checkedInAt DateTime?
