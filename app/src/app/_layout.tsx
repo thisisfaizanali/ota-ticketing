@@ -1,11 +1,27 @@
+import { Pressable, Text } from "react-native";
 import { Tabs } from "expo-router/js-tabs";
+import { useTranslation } from "react-i18next";
+import "@/i18n";
 
 export default function RootLayout() {
+  const { t, i18n } = useTranslation();
+  const toggle = () => i18n.changeLanguage(i18n.language === "ja" ? "en" : "ja");
+
   return (
-    <Tabs>
-      <Tabs.Screen name="index" options={{ title: "Events" }} />
-      <Tabs.Screen name="tickets" options={{ title: "My tickets" }} />
-      <Tabs.Screen name="scan" options={{ title: "Scan" }} />
+    <Tabs
+      screenOptions={{
+        headerRight: () => (
+          <Pressable onPress={toggle} style={{ paddingHorizontal: 16 }} accessibilityRole="button">
+            <Text style={{ color: "#208AEF", fontWeight: "600" }}>
+              {i18n.language === "ja" ? "EN" : "日本語"}
+            </Text>
+          </Pressable>
+        ),
+      }}
+    >
+      <Tabs.Screen name="index" options={{ title: t("tabs.events") }} />
+      <Tabs.Screen name="tickets" options={{ title: t("tabs.tickets") }} />
+      <Tabs.Screen name="scan" options={{ title: t("tabs.scan") }} />
     </Tabs>
   );
 }

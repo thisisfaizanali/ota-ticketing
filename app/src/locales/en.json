@@ -1,0 +1,29 @@
+{
+  "tabs": { "events": "Events", "tickets": "My tickets", "scan": "Scan" },
+  "events": {
+    "empty": "No upcoming events",
+    "left": "{{count}} left",
+    "soldOut": "Sold out",
+    "book_one": "Book {{count}} ticket",
+    "book_other": "Book {{count}} tickets",
+    "booked": "Booked!",
+    "bookedMessage_one": "{{count}} ticket for {{name}}",
+    "bookedMessage_other": "{{count}} tickets for {{name}}",
+    "bookFailed": "Booking failed",
+    "notEnough": "Not enough tickets left."
+  },
+  "tickets": { "empty": "No tickets yet", "checkedIn": "Checked in {{date}}" },
+  "scan": {
+    "permission": "Camera access is needed to scan tickets.",
+    "allow": "Allow camera",
+    "denied": "Camera access was denied. Enable it for this app in your phone's settings.",
+    "checkedIn": "Checked in\n{{name}}",
+    "already": "Already checked in at {{date}}",
+    "unknown": "Unknown ticket",
+    "next": "Scan next"
+  },
+  "common": {
+    "retry": "Retry",
+    "network": "Can't reach the server. Check your connection and EXPO_PUBLIC_API_URL."
+  }
+}

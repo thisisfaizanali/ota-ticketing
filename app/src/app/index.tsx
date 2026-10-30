@@ -9,13 +9,16 @@ import {
   Text,
   View,
 } from "react-native";
-import { bookEvent, formatDate, getEvents, type Event } from "@/api";
+import { useTranslation } from "react-i18next";
+import { errorMessage, locale } from "@/i18n";
+import { ApiError, bookEvent, formatDate, getEvents, type Event } from "@/api";
 
-const yen = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY" });
+const yen = (n: number) => new Intl.NumberFormat(locale(), { style: "currency", currency: "JPY" }).format(n);
 
 export default function EventsScreen() {
+  const { t } = useTranslation();
   const [events, setEvents] = useState<Event[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -23,7 +26,7 @@ export default function EventsScreen() {
       setEvents(await getEvents());
       setError(null);
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     }
   }, []);
 
@@ -41,8 +44,8 @@ export default function EventsScreen() {
   if (!events)
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>{error}</Text>
-        <Button title="Retry" onPress={() => { setError(null); load(); }} />
+        <Text style={styles.error}>{errorMessage(error)}</Text>
+        <Button title={t("common.retry")} onPress={() => { setError(null); load(); }} />
       </View>
     );
 
@@ -54,12 +57,14 @@ export default function EventsScreen() {
       contentContainerStyle={styles.list}
       refreshing={refreshing}
       onRefresh={refresh}
-      ListEmptyComponent={<Text style={styles.muted}>No upcoming events</Text>}
+      ListHeaderComponent={error ? <Text style={styles.banner}>{errorMessage(error)}</Text> : undefined}
+      ListEmptyComponent={<Text style={styles.muted}>{t("events.empty")}</Text>}
     />
   );
 }
 
 function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<void> }) {
+  const { t } = useTranslation();
   const [qty, setQty] = useState(1);
   const [booking, setBooking] = useState(false);
   const max = Math.min(4, event.ticketsLeft);
@@ -70,10 +75,11 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
     setBooking(true);
     try {
       await bookEvent(event.id, quantity);
-      Alert.alert("Booked!", `${quantity} ticket(s) for ${event.name}`);
+      Alert.alert(t("events.booked"), t("events.bookedMessage", { count: quantity, name: event.name }));
       setQty(1);
     } catch (e) {
-      Alert.alert("Booking failed", (e as Error).message);
+      const notEnough = e instanceof ApiError && e.status === 409;
+      Alert.alert(t("events.bookFailed"), notEnough ? t("events.notEnough") : errorMessage(e));
     } finally {
       await onBooked();
       setBooking(false);
@@ -86,8 +92,8 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
       <Text style={styles.muted}>{formatDate(event.date)}</Text>
       <Text style={styles.muted}>{event.venue}</Text>
       <View style={styles.row}>
-        <Text style={styles.price}>{yen.format(event.priceYen)}</Text>
-        <Text style={styles.muted}>{event.ticketsLeft} left</Text>
+        <Text style={styles.price}>{yen(event.priceYen)}</Text>
+        <Text style={styles.muted}>{t("events.left", { count: event.ticketsLeft })}</Text>
       </View>
       {!soldOut && (
         <View style={styles.stepper}>
@@ -104,7 +110,7 @@ function EventCard({ event, onBooked }: { event: Event; onBooked: () => Promise<
         {booking ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.bookText}>{soldOut ? "Sold out" : "Book"}</Text>
+          <Text style={styles.bookText}>{soldOut ? t("events.soldOut") : t("events.book", { count: quantity })}</Text>
         )}
       </Pressable>
     </View>
@@ -126,6 +132,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "600" },
   muted: { color: "#666" },
   error: { color: "#c00", textAlign: "center" },
+  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
   row: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
   price: { fontSize: 16, fontWeight: "600" },
   stepper: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 8 },

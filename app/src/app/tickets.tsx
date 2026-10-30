@@ -2,11 +2,14 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
+import { useTranslation } from "react-i18next";
+import { errorMessage } from "@/i18n";
 import { formatDate, getMyTickets, type TicketWithEvent } from "@/api";
 
 export default function TicketsScreen() {
+  const { t } = useTranslation();
   const [tickets, setTickets] = useState<TicketWithEvent[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -14,7 +17,7 @@ export default function TicketsScreen() {
       setTickets(await getMyTickets());
       setError(null);
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     }
   }, []);
 
@@ -34,8 +37,8 @@ export default function TicketsScreen() {
   if (!tickets)
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>{error}</Text>
-        <Button title="Retry" onPress={() => { setError(null); load(); }} />
+        <Text style={styles.error}>{errorMessage(error)}</Text>
+        <Button title={t("common.retry")} onPress={() => { setError(null); load(); }} />
       </View>
     );
 
@@ -46,7 +49,8 @@ export default function TicketsScreen() {
       contentContainerStyle={styles.list}
       refreshing={refreshing}
       onRefresh={refresh}
-      ListEmptyComponent={<Text style={styles.empty}>No tickets yet</Text>}
+      ListHeaderComponent={error ? <Text style={styles.banner}>{errorMessage(error)}</Text> : undefined}
+      ListEmptyComponent={<Text style={styles.empty}>{t("tickets.empty")}</Text>}
       renderItem={({ item }) => (
         <View style={styles.card}>
           <QRCode value={item.code} size={160} />
@@ -56,7 +60,7 @@ export default function TicketsScreen() {
             <Text style={styles.muted}>{item.event.venue}</Text>
             <Text style={styles.code}>{item.code}</Text>
             {item.checkedInAt && (
-              <Text style={styles.badge}>Checked in {formatDate(item.checkedInAt)}</Text>
+              <Text style={styles.badge}>{t("tickets.checkedIn", { date: formatDate(item.checkedInAt) })}</Text>
             )}
           </View>
         </View>
@@ -74,6 +78,7 @@ const styles = StyleSheet.create({
   muted: { color: "#666" },
   code: { fontFamily: "monospace", marginTop: 4 },
   error: { color: "#c00", textAlign: "center" },
+  banner: { backgroundColor: "#c00", color: "#fff", borderRadius: 8, padding: 10, textAlign: "center", overflow: "hidden" },
   empty: { textAlign: "center", color: "#666", marginTop: 48 },
   badge: { marginTop: 8, backgroundColor: "#1a7f37", color: "#fff", borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, overflow: "hidden" },
 });
