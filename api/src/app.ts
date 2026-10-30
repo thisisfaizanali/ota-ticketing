@@ -15,7 +15,7 @@ app.post("/checkins", async (req, res) => {
     where: { code, checkedInAt: null },
     data: { checkedInAt: new Date() },
   });
-  const ticket = await prisma.ticket.findUnique({ where: { code } });
+  const ticket = await prisma.ticket.findUnique({ where: { code }, include: { event: true } });
   if (!ticket) return res.status(404).json({ error: "ticket not found" });
   if (count === 0) {
     return res.status(409).json({ error: "ticket already checked in", checkedInAt: ticket.checkedInAt });
