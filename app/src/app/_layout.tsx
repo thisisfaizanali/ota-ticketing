@@ -2,6 +2,7 @@ import { Pressable, Text } from "react-native";
 import { Tabs } from "expo-router/js-tabs";
 import { useTranslation } from "react-i18next";
 import "@/i18n";
+import { colors } from "@/theme";
 
 export default function RootLayout() {
   const { t, i18n } = useTranslation();
@@ -10,9 +11,10 @@ export default function RootLayout() {
   return (
     <Tabs
       screenOptions={{
+        sceneStyle: { backgroundColor: colors.bg },
         headerRight: () => (
           <Pressable onPress={toggle} style={{ paddingHorizontal: 16 }} accessibilityRole="button">
-            <Text style={{ color: "#208AEF", fontWeight: "600" }}>
+            <Text style={{ color: colors.primary, fontWeight: "600" }}>
               {i18n.language === "ja" ? "EN" : "日本語"}
             </Text>
           </Pressable>
