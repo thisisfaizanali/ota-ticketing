@@ -227,6 +227,31 @@ curl -s -X POST http://localhost:3000/checkins -H 'Content-Type: application/jso
 
 Codes, dates and timestamps will differ on your machine.
 
+## How overselling is prevented
+
+Booking runs one conditional `UPDATE` inside a transaction: decrement `ticketsLeft` by `quantity` only `WHERE ticketsLeft >= quantity`. MySQL row-locks the event row for that update, so two concurrent bookings can't both pass the check; if it affects 0 rows the API returns `409`, and the tickets are created only when it succeeded (same transaction).
+`npm test` fires 10 concurrent bookings at an event with 1 ticket and asserts exactly one `201`, nine `409`s and `ticketsLeft = 0`.
+
+## Check-in only once
+
+Check-in is a conditional `UPDATE ... SET checkedInAt = now WHERE code = ? AND checkedInAt IS NULL`. If it affects 0 rows for an existing ticket, the API returns `409` with the original `checkedInAt`.
+
+## Decisions & assumptions
+
+- `X-User-Id` identifies the user; it is not authentication.
+- `POST /checkins` needs no user: it is used by gate staff, not the ticket holder.
+- "Upcoming" means the event date is after now; past events are hidden and can't be booked.
+- Prices are integer JPY (`priceYen`), no decimals.
+- Ticket codes are random 16-hex-character strings (8 random bytes) and are the ticket's primary key.
+- The app aborts API requests after 10 seconds and shows a network error.
+
+## With more time
+
+- Real authentication, plus a staff role allowed to check tickets in
+- Pagination for events and tickets
+- Persist the language choice across app restarts
+- Offline cache of tickets so the QR shows without a connection
+
 ## Demo video
 
 Screen recording: <link>
