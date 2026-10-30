@@ -38,6 +38,8 @@ app/   Expo app: events, my tickets (QR), scanner, EN/JA
 - Docker Desktop (or your own MySQL 8)
 - An Android phone with Expo Go, on the same Wi-Fi as the PC
 
+The commands below use bash syntax (`cp`, single-quoted JSON in curl). On Windows, run them in Git Bash or WSL; PowerShell mangles the curl quoting.
+
 ## Run the API
 
 ```bash
@@ -114,6 +116,8 @@ npx expo start
 
 Scan the QR code in the terminal with Expo Go on your phone.
 
+Tested on Android with Expo Go. iOS Expo Go should work the same way but wasn't tested.
+
 Why not `localhost`? The app runs on the phone, so `localhost` there means the phone itself, not your PC. The phone has to reach the API over the network using the PC's LAN IP (the API binds to `0.0.0.0`).
 
 Troubleshooting:
@@ -121,6 +125,16 @@ Troubleshooting:
 - Phone and PC must be on the same Wi-Fi network (guest networks often block device-to-device traffic).
 - Allow Node.js through the firewall (on Windows, allow it on Private networks when prompted).
 - After changing `.env`, restart with a cleared cache: `npx expo start -c`. `EXPO_PUBLIC_*` values are baked in at bundle time.
+
+### Try the scanner
+
+The Scan tab checks a ticket in by reading its QR code with the camera. A phone can't scan its own screen, so show the QR on another screen, e.g. on the PC:
+
+```bash
+npx --yes qrcode-terminal <code>
+```
+
+Scan it: the result is green the first time and amber "Already checked in" the second time.
 
 ## API reference
 
