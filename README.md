@@ -268,4 +268,4 @@ Check-in is a conditional `UPDATE ... SET checkedInAt = now WHERE code = ? AND c
 
 ## Demo video
 
-Screen recording: <link>
+Screen recording: linked in the submission email.
