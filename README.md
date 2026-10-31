@@ -60,7 +60,7 @@ Run the tests (needs the database up and migrated):
 npm test
 ```
 
-**Using your own MySQL:** skip `docker compose up -d` and point `DATABASE_URL` in `api/.env` at your server, e.g. `mysql://USER:PASSWORD@localhost:3306/ota`. Create the `ota` database first, then run the migrate and seed steps as above.
+**Using your own MySQL:** skip `docker compose up -d` and point `DATABASE_URL` in `api/.env` at your server, e.g. `mysql://USER:PASSWORD@localhost:3306/ota?allowPublicKeyRetrieval=true`. Create the `ota` database first, then run the migrate and seed steps as above.
 
 ## Seeded data
 
